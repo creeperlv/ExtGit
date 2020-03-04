@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ExtGit": {
+      "commandName": "Project",
+      "commandLineArgs": "-C"
+    }
+  }
+}

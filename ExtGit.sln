@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29820.132
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtGit", "ExtGit\ExtGit.csproj", "{5C79AE0E-37AE-4BC7-BB05-7DB790A9273C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtGit.Core", "ExtGit.Core\ExtGit.Core.csproj", "{6EEF7D64-FB2E-467C-8315-CBD24CBF88DE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5C79AE0E-37AE-4BC7-BB05-7DB790A9273C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C79AE0E-37AE-4BC7-BB05-7DB790A9273C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C79AE0E-37AE-4BC7-BB05-7DB790A9273C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C79AE0E-37AE-4BC7-BB05-7DB790A9273C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EEF7D64-FB2E-467C-8315-CBD24CBF88DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EEF7D64-FB2E-467C-8315-CBD24CBF88DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EEF7D64-FB2E-467C-8315-CBD24CBF88DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EEF7D64-FB2E-467C-8315-CBD24CBF88DE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D6256A88-1085-4CCB-99EC-3C8281ADDBA1}
+	EndGlobalSection
+EndGlobal
