@@ -48,11 +48,20 @@ namespace ExtGit
                     case "VERSION":
                     case "-VERSION":
                     case "--VERSION":
+                    case "VER":
                     case "-VER":
                     case "--VER":
                         CurrentOperation = Operation.Version;
                         break;
+                    case "NEW":
+                    case "INIT":
+                    case "-INIT":
+                    case "--I":
+                    case "--N":
+                        CurrentOperation = Operation.Create;
+                        break;
                     default:
+                        Console.WriteLine("Unknown parameter:"+args[i]);
                         break;
                 }
             }
@@ -106,6 +115,14 @@ namespace ExtGit
                 case Operation.Version:
                     ShowVersion();
                     break;
+                case Operation.Create:
+                    {
+                        Repo repo = new Repo();
+                        repo.ExtGitVer = ShellVersion;
+                        repo.ExtGitVerCore = CoreLib.CurrentCore.CoreVersion;
+                        Repo.Create(repo, new DirectoryInfo("./").FullName);
+                    }
+                    break;
                 default:
                     break;
             }
@@ -114,13 +131,13 @@ namespace ExtGit
         private static void ShowVersion()
         {
             Console.WriteLine("");
-            Console.WriteLine("ExtGit Components:");
+            Console.WriteLine(Language.CurrentLanguage.Get("VERINFOSTR00","ExtGit Components:"));
             Console.WriteLine("");
             Console.WriteLine("\tShell Version:\t" + ShellVersion.ToString()+$"({ShellVersion.Build})");
             Console.WriteLine("\tCore Version:\t" + CoreLib.CurrentCore.CoreVersion.ToString() + $"({CoreLib.CurrentCore.CoreVersion.Build})");
             Console.WriteLine("");
-            Console.WriteLine("\tTarget Config:\t" + Repo.CurrentConfigVer.ToString() + $"({Repo.CurrentConfigVer.Build})");
-            Console.WriteLine("\tMin Config:\t" + Repo.MinConfigVer.ToString() + $"({Repo.MinConfigVer.Build})");
+            Console.WriteLine($"\t{Language.CurrentLanguage.Get("VERINFOSTR01", "Target Config:")}\t" + Repo.CurrentConfigVer.ToString() + $"({Repo.CurrentConfigVer.Build})");
+            Console.WriteLine($"\t{Language.CurrentLanguage.Get("VERINFOSTR02", "Min Config:")}\t" + Repo.MinConfigVer.ToString() + $"({Repo.MinConfigVer.Build})");
         }
 
         static void ShowHelp()
@@ -132,10 +149,13 @@ namespace ExtGit
             Console.WriteLine("\t-H|--H|-?|\tShow this help.");
             Console.WriteLine("\t--?|HELP|");
             Console.WriteLine("\t-HELP|--HELP");
+            Console.WriteLine("\t-V|--V|VER|\tShow version information");
+            Console.WriteLine("\tVERSION|-VERSION|");
+            Console.WriteLine("\t-VER|--VER|");
         }
     }
     enum Operation
     {
-        Commit,Checkout,None,Help,Version
+        Commit,Checkout,None,Help,Version,Create,Graft
     }
 }

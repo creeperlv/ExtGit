@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ExtGit.Localization;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -24,31 +25,73 @@ namespace ExtGit.Core.Version1
         private List<TraceIndex> TracedFiles = new List<TraceIndex>();
 
         FileInfo ConfigurationFile;
+
+        bool isTemplate = false;
+        public Repo()
+        {
+            isTemplate = true;
+        }
         public Repo(string RepoPath)
         {
             this.RepoPath = RepoPath;
             ConfigurationFile = new FileInfo(Path.Combine(RepoPath, ".extgit", ".extgitconf", "Repo.extgit"));
             if (!ConfigurationFile.Exists)
             {
-                throw new Exception("Target directory is not an ExtGit directory!");
+                throw new Exception(Language.CurrentLanguage.Get("ERROR_CODE00", "Target directory is not an ExtGit directory!"));
             }
+            Load();
             DirectoryInfo directoryInfo = new DirectoryInfo(Path.Combine(RepoPath, ".extgit", ".extgitconf", "Traces"));
-            var existedTraces= directoryInfo.EnumerateFiles();
+            var existedTraces = directoryInfo.EnumerateFiles();
             foreach (var item in existedTraces)
             {
                 TracedFiles.Add(new TraceIndex(item.FullName));
             }
         }
+        public static void Create(Repo r, string RepoPath)
+        {
+            var ConfigurationFile = new FileInfo(Path.Combine(RepoPath, ".extgit", ".extgitconf", "Repo.extgit"));
+
+        }
+        void Load()
+        {
+            var content = File.ReadAllLines(ConfigurationFile.FullName);
+            foreach (var item in content)
+            {
+                if (item.StartsWith("ExtGitVer="))
+                {
+                    ExtGitVer=Version.Parse(item.Substring("ExtGitVer=".Length));
+                }
+                else if (item.StartsWith("ExtGitCoreVer="))
+                {
+                    ExtGitVerCore = Version.Parse(item.Substring("ExtGitCoreVer=".Length));
+                }
+                else if (item.StartsWith("MaxFileSize="))
+                {
+                    MaxFileSize = int.Parse(item.Substring("MaxFileSize=".Length));
+                }
+                else if (item.StartsWith("AutoTrack="))
+                {
+                    AutoTrack = bool.Parse(item.Substring("AutoTrack=".Length));
+                }
+            }
+        }
         public void Commit(ref double progress)
         {
+            if (isTemplate == true)
+            {
+                throw new Exception(Language.CurrentLanguage.Get("ERROR_CODE01", "Current repository is a TEMPLATE repository!"));
+            }
             FileInfo GitIgnorance = new FileInfo(Path.Combine(RepoPath, ".gitignore"));
-            var ignoranceF=File.ReadAllLines(GitIgnorance.FullName);
+            var ignoranceF = File.ReadAllLines(GitIgnorance.FullName);
 
         }
         //public List<>
         public void Checkout(ref double progress)
         {
-        
+            if (isTemplate == true)
+            {
+                throw new Exception(Language.CurrentLanguage.Get("ERROR_CODE01", "Current repository is a TEMPLATE repository!"));
+            }
         }
     }
 }

@@ -2,3 +2,8 @@
 PREVIEW00=This software still in an early preview
 TITLE1="Designed for What Happened to Site-13?"
 FATAL=Fatal:
+ERROR_CODE00=Target directory is not an ExtGit directory!
+ERROR_CODE01=Current repository is a TEMPLATE repository!
+VERINFOSTR00=ExtGit Components:
+VERINFOSTR01=Target Config:
+VERINFOSTR02=Min Config:

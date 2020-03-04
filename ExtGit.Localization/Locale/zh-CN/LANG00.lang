@@ -2,3 +2,8 @@
 PREVIEW00=该软件仍处于早期预览。
 TITLE1=为《Site-13发生了什么？》设计
 FATAL=致命错误：
+ERROR_CODE00=目标目录不是一个ExtGit目录！
+ERROR_CODE01=当前储存库是一个模板存储库！
+VERINFOSTR00=ExtGit组件：
+VERINFOSTR01=目标配置：
+VERINFOSTR02=最低配置：
