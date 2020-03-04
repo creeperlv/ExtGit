@@ -23,11 +23,15 @@ namespace ExtGit.Core.Version1
 
         private List<TraceIndex> TracedFiles = new List<TraceIndex>();
 
-        private FileInfo ConfigurationFile;
+        FileInfo ConfigurationFile;
         public Repo(string RepoPath)
         {
             this.RepoPath = RepoPath;
             ConfigurationFile = new FileInfo(Path.Combine(RepoPath, ".extgit", ".extgitconf", "Repo.extgit"));
+            if (!ConfigurationFile.Exists)
+            {
+                throw new Exception("Target directory is not an ExtGit directory!");
+            }
             DirectoryInfo directoryInfo = new DirectoryInfo(Path.Combine(RepoPath, ".extgit", ".extgitconf", "Traces"));
             var existedTraces= directoryInfo.EnumerateFiles();
             foreach (var item in existedTraces)

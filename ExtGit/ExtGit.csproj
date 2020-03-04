@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ExtGit.Core\ExtGit.Core.csproj" />
+    <ProjectReference Include="..\ExtGit.Localization\ExtGit.Localization.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,6 @@
 ﻿using ExtGit.Core;
 using ExtGit.Core.Version1;
+using ExtGit.Localization;
 using System;
 using System.IO;
 
@@ -55,26 +56,47 @@ namespace ExtGit
                         break;
                 }
             }
-
-            Console.WriteLine("ExtGit - Designed for commit large file without GIT-LFS to host platforms.");
-            Console.WriteLine("This software still in an early preview");
+            Console.WriteLine(Language.CurrentLanguage.Get("TITLE0","ExtGit - Designed for commit large file without GIT-LFS to host platforms."));
+            Console.WriteLine(Language.CurrentLanguage.Get("PREVIEW00","This software still in an early preview"));
             Console.WriteLine("");
-            Console.WriteLine("Designed for What Happened to Site-13?");
+            Console.WriteLine(Language.CurrentLanguage.Get("TITLE1", "Designed for What Happened to Site-13?"));
             switch (CurrentOperation)
             {
                 case Operation.Commit:
                     {
-                        double prog = 0.0;
-                        Repo r = new Repo(new DirectoryInfo("./").FullName);
-                        r.Commit(ref prog);
+                        try
+                        {
+
+                            double prog = 0.0;
+                            Repo r = new Repo(new DirectoryInfo("./").FullName);
+                            r.Commit(ref prog);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.Write(Language.CurrentLanguage.Get("FATAL", "Fatal:"));
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Console.WriteLine(e.Message);
+                        }
                     }
                     break;
                 case Operation.Checkout:
                     {
 
-                        double prog = 0.0;
-                        Repo r = new Repo(new DirectoryInfo("./").FullName);
-                        r.Checkout(ref prog);
+                        try
+                        {
+
+                            double prog = 0.0;
+                            Repo r = new Repo(new DirectoryInfo("./").FullName);
+                            r.Checkout(ref prog);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.Write("Fatal:");
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Console.WriteLine(e.Message);
+                        }
                     }
                     break;
                 case Operation.None:
