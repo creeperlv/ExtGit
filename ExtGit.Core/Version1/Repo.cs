@@ -1,15 +1,22 @@
-﻿using ExtGit.Localization;
+﻿using ExtGit.Core.FileHash;
+using ExtGit.Core.Utilities;
+using ExtGit.Localization;
+using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Version = System.Version;
 
 namespace ExtGit.Core.Version1
 {
     public class Repo
     {
-        public string RepoPath { get; private set; }
-
+        public string RepoPath
+        {
+            get; private set;
+        }
+        public static Repository GitRepo;
         public static readonly Version CurrentConfigVer = new Version(1, 0, 1, 0);
         public static readonly Version MinConfigVer = new Version(1, 0, 1, 0);
         public Version ExtGitVer;
@@ -35,6 +42,7 @@ namespace ExtGit.Core.Version1
         {
             this.RepoPath = RepoPath;
             ConfigurationFile = new FileInfo(Path.Combine(RepoPath, ".extgit", ".extgitconf", "Repo.extgit"));
+            Repo.GitRepo = new Repository(Path.Combine(RepoPath, ".extgit"));
             if (!ConfigurationFile.Exists)
             {
                 throw new Exception(Language.CurrentLanguage.Get("ERROR_CODE00", "Target directory is not an ExtGit directory!"));
@@ -44,7 +52,7 @@ namespace ExtGit.Core.Version1
             var existedTraces = directoryInfo.EnumerateFiles();
             foreach (var item in existedTraces)
             {
-                TracedFiles.Add(new TraceIndex(item,RepoPath));
+                TracedFiles.Add(new TraceIndex(item, RepoPath));
             }
         }
         public static void Create(Repo r, string RepoPath)
@@ -128,9 +136,76 @@ namespace ExtGit.Core.Version1
             {
                 throw new Exception(Language.CurrentLanguage.Get("ERROR_CODE01", "Current repository is a TEMPLATE repository!"));
             }
-            FileInfo GitIgnorance = new FileInfo(Path.Combine(RepoPath, ".gitignore"));
-            var ignoranceF = File.ReadAllLines(GitIgnorance.FullName);
+            //GitRepo.Ignore.IsPathIgnored()
 
+            {
+                //Will read all filses.
+                CheckDirectory(new DirectoryInfo(RepoPath));
+                DealTracesUpdate();
+            }
+        }
+        public void DealTracesUpdate()
+        {
+
+        }
+        public void CheckDirectory(DirectoryInfo directory)
+        {
+            if (directory.FullName.ToUpper() == Path.Combine(RepoPath, ".extgit").ToUpper())
+            {
+                //Don't self copy :P.
+                return;
+            }
+            var RP = PathHelper.GetRelativePath(RepoPath, directory.FullName);
+            {
+                {
+                    //Get Relative Path
+                    if (GitRepo.Ignore.IsPathIgnored(RP))
+                    {
+                        return;
+                    }
+                }
+            }
+            {
+                if (!Directory.Exists(Path.Combine(RepoPath, ".extgit", RP)))
+                {
+                    Directory.CreateDirectory(Path.Combine(RepoPath, ".extgit", RP));
+                    Directory.SetCreationTime(Path.Combine(RepoPath, ".extgit", RP), directory.CreationTime);
+                }
+            }
+            foreach (var item in directory.EnumerateDirectories())
+            {
+                CheckDirectory(item);
+            }
+            Directory.SetLastAccessTime(Path.Combine(RepoPath, ".extgit", RP), directory.LastAccessTime);
+            Directory.SetLastWriteTime(Path.Combine(RepoPath, ".extgit", RP), directory.LastWriteTime);
+            foreach (var item in directory.EnumerateFiles())
+            {
+                var FRP = PathHelper.GetRelativePath(RepoPath, item.FullName);
+                var FAP = Path.Combine(RepoPath, ".extgit", FRP);
+                if (!File.Exists(FAP))
+                {
+                    //Check trace;
+                    foreach (var titem in TracedFiles)
+                    {
+                        if (titem.RelativeFilePath == FRP)
+                        {
+                            break;
+                        }
+                    }
+                    {
+                        //File is not tracked.
+                        // Detect weather to trace;
+                    }
+                    continue;
+                }
+                var NFHASH = SHA256.ComputeSHA256(item.FullName);
+                var OFHASH = SHA256.ComputeSHA256(FAP);
+                if (NFHASH == OFHASH)
+                {
+                    //the same file, ignore.
+                    continue;
+                }
+            }
         }
         //public List<>
         public void Checkout(ref double progress)
