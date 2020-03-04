@@ -60,6 +60,12 @@ namespace ExtGit
                     case "--N":
                         CurrentOperation = Operation.Create;
                         break;
+                    case "TEST":
+                    case "-TEST":
+                    case "--T":
+                    case "-T":
+                        CurrentOperation = Operation.FunctionTest;
+                        break;
                     default:
                         Console.WriteLine("Unknown parameter:"+args[i]);
                         break;
@@ -112,6 +118,11 @@ namespace ExtGit
                 case Operation.Help:
                     ShowHelp();
                     break;
+                case Operation.FunctionTest:
+                    {
+                        Tester.Test00();
+                    }
+                    break;
                 case Operation.Version:
                     ShowVersion();
                     break;
@@ -156,6 +167,6 @@ namespace ExtGit
     }
     enum Operation
     {
-        Commit,Checkout,None,Help,Version,Create,Graft
+        Commit,Checkout,None,Help,Version,Create,Graft,FunctionTest
     }
 }

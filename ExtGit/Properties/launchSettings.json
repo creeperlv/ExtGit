@@ -2,7 +2,7 @@
   "profiles": {
     "ExtGit": {
       "commandName": "Project",
-      "commandLineArgs": "-V"
+      "commandLineArgs": "-T"
     }
   }
 }
