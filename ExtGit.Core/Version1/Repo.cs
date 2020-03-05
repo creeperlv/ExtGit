@@ -21,7 +21,7 @@ namespace ExtGit.Core.Version1
         public static readonly Version MinConfigVer = new Version(1, 0, 1, 0);
         public Version ExtGitVer;
         public Version ExtGitVerCore;
-        public int MaxFileSize = 1024 * 1024 * 99;//100MB is the max file size limit of GitHub.
+        public long MaxFileSize = 1024 * 1024 * 99;//100MB is the max file size limit of GitHub.
         public bool AutoTrack = true;//Auto track files that overflow the limit.
         public double TraceTriggerLevel = 0.9;//MaxFile*TraceTriggerLevel is the actual detection-line.
         public bool IgnoreIgnoredFile = true;//Load .gitignore
@@ -34,6 +34,9 @@ namespace ExtGit.Core.Version1
         FileInfo ConfigurationFile;
 
         bool isTemplate = false;
+
+        long realDetectionLine = 0;
+
         public Repo()
         {
             isTemplate = true;
@@ -52,7 +55,7 @@ namespace ExtGit.Core.Version1
             var existedTraces = directoryInfo.EnumerateFiles();
             foreach (var item in existedTraces)
             {
-                TracedFiles.Add(new TraceIndex(item, RepoPath));
+                TracedFiles.Add(new TraceIndex(item, this));
             }
         }
         public static void Create(Repo r, string RepoPath)
@@ -98,7 +101,7 @@ namespace ExtGit.Core.Version1
                     }
                     else if (item.StartsWith("MaxFileSize="))
                     {
-                        MaxFileSize = int.Parse(item.Substring("MaxFileSize=".Length));
+                        MaxFileSize = long.Parse(item.Substring("MaxFileSize=".Length));
                     }
                     else if (item.StartsWith("AutoTrack="))
                     {
@@ -129,6 +132,7 @@ namespace ExtGit.Core.Version1
                 {
                 }
             }
+            realDetectionLine = (long)(((double)MaxFileSize) * TraceTriggerLevel);
         }
         public void Commit(ref double progress)
         {
@@ -195,6 +199,14 @@ namespace ExtGit.Core.Version1
                     {
                         //File is not tracked.
                         // Detect weather to trace;
+                        if (AutoTrack)
+                        {
+                            if (item.Length > realDetectionLine)
+                            {
+                                //Add to trace.
+                                TraceIndex.Track(item, this);
+                            }
+                        }
                     }
                     continue;
                 }
