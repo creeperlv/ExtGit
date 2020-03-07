@@ -198,14 +198,31 @@ namespace ExtGit.Core.Version1
                     }
                     {
                         //File is not tracked.
+                        bool isTracked = false;
                         // Detect weather to trace;
                         if (AutoTrack)
                         {
                             if (item.Length > realDetectionLine)
                             {
                                 //Add to trace.
-                                TraceIndex.Track(item, this);
+                                TracedFiles.Add(TraceIndex.TrackAndRecord(item, this));
+                                isTracked = true;
+                                //TraceIndex.Track(item, this);
+                                continue;
                             }
+                        }
+                        foreach (var type in AutoTraceFileTypes)
+                        {
+                            if (item.FullName.ToUpper().EndsWith(type.ToUpper()))
+                            {
+                                TracedFiles.Add(TraceIndex.TrackAndRecord(item, this));
+                                isTracked = true;
+                                break;
+                            }
+                        }
+                        if (isTracked==false)
+                        {
+                            item.CopyTo(FAP);
                         }
                     }
                     continue;
