@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ExtGit.Core.FileHash
 {
-    public class SHA256
+    public class SHA256Hash
     {
         public static string ComputeSHA256(string fileName)
         {

@@ -18,7 +18,7 @@ namespace ExtGit
                 try
                 {
                     Console.WriteLine("\tTest ID: {04EE0BD8-57E6-4013-B972-BFE4FB081235}");
-                    Console.WriteLine("\t\tFile Hash:" + SHA256.ComputeSHA256("./ExtGit.exe"));
+                    Console.WriteLine("\t\tFile Hash:" + SHA256Hash.ComputeSHA256("./ExtGit.exe"));
                     Console.WriteLine("\t\t[OK]");
                 }
                 catch (Exception e)
