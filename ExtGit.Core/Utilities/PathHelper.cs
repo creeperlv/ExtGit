@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Web;
 
 namespace ExtGit.Core.Utilities
 {
+    /// <summary>
+    /// Tools on path, including compute
+    /// </summary>
     public class PathHelper
     {
         public static string GetRelativePath(string master, string slave)
@@ -19,6 +20,18 @@ namespace ExtGit.Core.Utilities
             Uri u3 = u1.MakeRelativeUri(u2);
 
             return HttpUtility.UrlDecode(u3.OriginalString);
+        }
+        public static void RemoveFolderR(DirectoryInfo directory)
+        {
+            foreach (var item in directory.EnumerateDirectories())
+            {
+                RemoveFolderR(item);
+            }
+            foreach (var item in directory.EnumerateFiles())
+            {
+                item.Delete();
+            }
+            directory.Delete();
         }
     }
 }

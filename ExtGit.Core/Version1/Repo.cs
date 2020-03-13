@@ -300,6 +300,91 @@ namespace ExtGit.Core.Version1
             {
                 throw new Exception(Language.CurrentLanguage.Get("ERROR_CODE01", "Current repository is a TEMPLATE repository!"));
             }
+            CheckDirectory(new DirectoryInfo(RepoPath));
+            foreach (var item in TracedFiles)
+            {
+                item.CombineAndOverwrite();
+            }
         }
+        public void OverwriteDiretory(DirectoryInfo directory)
+        {
+            
+            Debugger.CurrentDebugger.Log($"Current Folder: {directory.FullName}", Utilities.LogLevel.Development);
+            if (directory.FullName.ToUpper() == Path.Combine(RepoPath, ".extgit").ToUpper())
+            {
+                Debugger.CurrentDebugger.Log($"Folder: {directory.FullName} is ignored", Utilities.LogLevel.Development);
+                //Don't self copy :P.
+                return;
+            }
+            var RP = PathHelper.GetRelativePath(RepoPath, directory.FullName);
+            {
+                {
+                    //Get Relative Path.
+                    try
+                    {
+                        Debugger.CurrentDebugger.Log("Check:" + RP, Utilities.LogLevel.Development);
+                        if (GitRepo.Ignore.IsPathIgnored(RP + Path.DirectorySeparatorChar))
+                        {
+                            return;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+            }
+            {
+                if (!Directory.Exists(Path.Combine(RepoPath, ".extgit", RP)))
+                {
+                    PathHelper.RemoveFolderR(directory);
+                    return;
+                }
+            }
+            foreach (var item in directory.EnumerateDirectories())
+            {
+                Debugger.CurrentDebugger.Log($"Folder: {item.FullName}", Utilities.LogLevel.Development);
+                CheckDirectory(item);
+            }
+            Debugger.CurrentDebugger.Log($"Deal with: {directory.FullName}", Utilities.LogLevel.Development);
+            Directory.SetLastAccessTime(Path.Combine(RepoPath, ".extgit", RP), directory.LastAccessTime);
+            Directory.SetLastWriteTime(Path.Combine(RepoPath, ".extgit", RP), directory.LastWriteTime);
+            foreach (var item in directory.EnumerateFiles())
+            {
+                Debugger.CurrentDebugger.Log($"File: {item.FullName}", Utilities.LogLevel.Development);
+                var FRP = PathHelper.GetRelativePath(RepoPath, item.FullName);
+                var FAP = Path.Combine(RepoPath, ".extgit", FRP);
+                Debugger.CurrentDebugger.Log($"File: RelatedPath:{FRP}", Utilities.LogLevel.Development);
+                if (!File.Exists(FAP))
+                {
+                    //Check trace;
+                    bool isTracked = false;
+                    foreach (var titem in TracedFiles)
+                    {
+                        if (titem.RelativeFilePath == FRP)
+                        {
+                            Debugger.CurrentDebugger.Log($"Traced File:{titem.RelativeFilePath}, Now relative file:{FRP}", Utilities.LogLevel.Development);
+                            isTracked = true;
+                            break;
+                        }
+                    }
+                    if (isTracked == false)
+                    {
+                        item.Delete();
+                    }
+                    continue;
+                }
+                var NFHASH = SHA256Hash.ComputeSHA256(item.FullName);
+                var OFHASH = SHA256Hash.ComputeSHA256(FAP);
+                if (NFHASH == OFHASH)
+                {
+                    //the same file, ignore.
+                    continue;
+                }
+                //Different File.
+                //Overwrite.
+                File.Copy(FAP, item.FullName, true);
+            }
+        }
+
     }
 }

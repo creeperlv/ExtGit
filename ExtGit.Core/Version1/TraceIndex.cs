@@ -116,6 +116,10 @@ namespace ExtGit.Core.Version1
             else
             {
                 var p = Path.Combine(Parent.RepoPath, RelativeFilePath);
+                if (!File.Exists(p))
+                {
+                    File.Create(p).Close();
+                }
                 var FW = File.OpenWrite(p);
                 for (int i = 0; i < Chunks.Count; i++)
                 {
