@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <ApplicationIcon>ExtGit.ico</ApplicationIcon>
+    <ApplicationIcon>ExtGit-128.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
