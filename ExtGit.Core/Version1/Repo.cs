@@ -66,7 +66,7 @@ namespace ExtGit.Core.Version1
             {
                 Directory.CreateDirectory(Path.Combine(RepoPath, ".extgit", ".extgitconf"));
             }
-            if (!Directory.Exists(Path.Combine(RepoPath, ".extgit", ".extgitconf","Traces")))
+            if (!Directory.Exists(Path.Combine(RepoPath, ".extgit", ".extgitconf", "Traces")))
             {
                 Directory.CreateDirectory(Path.Combine(RepoPath, ".extgit", ".extgitconf", "Traces"));
             }
@@ -162,7 +162,28 @@ namespace ExtGit.Core.Version1
             {
                 //Will read all filses.
                 CheckDirectory(new DirectoryInfo(RepoPath));
+                DealWithTracedFileDeletion();
                 DealTracesUpdate();
+                //Finalize
+            }
+        }
+        public void WipeUselessTraces()
+        {
+            foreach (var item in TracedFiles)
+            {
+                item.Urgent();
+            }
+        }
+        public void DealWithTracedFileDeletion()
+        {
+            foreach (var item in TracedFiles)
+            {
+                var AssumedPath = Path.Combine(RepoPath,
+                item.RelativeFilePath);
+                if (!File.Exists(AssumedPath))
+                {
+                    item.Schedule();
+                }
             }
         }
         public void DealTracesUpdate()
@@ -188,7 +209,7 @@ namespace ExtGit.Core.Version1
                     try
                     {
                         Debugger.CurrentDebugger.Log("Check:" + RP, Utilities.LogLevel.Development);
-                        if (GitRepo.Ignore.IsPathIgnored(RP+Path.DirectorySeparatorChar))
+                        if (GitRepo.Ignore.IsPathIgnored(RP + Path.DirectorySeparatorChar))
                         {
                             return;
                         }
@@ -232,7 +253,7 @@ namespace ExtGit.Core.Version1
                             break;
                         }
                     }
-                    if(isTracked==false)
+                    if (isTracked == false)
                     {
                         //File is not tracked.
                         // Detect weather to trace;

@@ -3,7 +3,6 @@ using ExtGit.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace ExtGit.Core.Version1
 {
@@ -15,6 +14,7 @@ namespace ExtGit.Core.Version1
         public string FileHash;
         public FileInfo IndexFile;
         //private string RepoBase;
+        private bool isDeletionScheduled = false;
         private Repo Parent;
         TraceIndex()
         {
@@ -26,6 +26,19 @@ namespace ExtGit.Core.Version1
             Parent = RepoBase;
             LoadIndex();
             Debugger.CurrentDebugger.Log("Trace Index Found:" + IndexFile.Name + $", FileHash:{FileHash}", LogLevel.Development);
+        }
+        public void Schedule()
+        {
+            isDeletionScheduled = true;
+        }
+        public void Redress()
+        {
+            isDeletionScheduled = false;
+        }
+        public void Urgent()
+        {
+            if (isDeletionScheduled)
+                IndexFile.Delete();
         }
         public static TraceIndex Track(FileInfo TargetFile, Repo ParentRepo)
         {
@@ -87,10 +100,11 @@ namespace ExtGit.Core.Version1
                 File.WriteAllText(FileName, NewContent);
             }
 
-            Debugger.CurrentDebugger.Log("Start to trace:" + T.RelativeFilePath, LogLevel.Development);
+            Debugger.CurrentDebugger.Log("Start to trace:" + T.RelativeFilePath, Utilities.LogLevel.Development);
             T.IndexFile = new FileInfo(FileName);
             return T;
         }
+        //Work with check out.
         public void CombineAndOverwrite()
         {
             var CurrentHash = SHA256Hash.ComputeSHA256(Path.Combine(Parent.RepoPath, RelativeFilePath));
@@ -120,8 +134,25 @@ namespace ExtGit.Core.Version1
                 FW.Close();
             }
         }
+        //Work with Commit
         public void DifferAndUpdate()
         {
+            if (isDeletionScheduled)
+            {
+                //When deletion is scheduled, delete all related chunks.
+                var chunk = Path.Combine(Parent.RepoPath, ".extgit", ".extgitconf", "Traces", Path.GetFileNameWithoutExtension(IndexFile.FullName));
+                if (Directory.Exists(chunk))
+                {
+                    DirectoryInfo d = new DirectoryInfo(chunk);
+
+                    foreach (var item in d.EnumerateFiles())
+                    {
+                        item.Delete();
+                    }
+                    d.Delete();
+                }
+                return;
+            }
             var CurrentHash = SHA256Hash.ComputeSHA256(Path.Combine(Parent.RepoPath, RelativeFilePath));
             if (CurrentHash == FileHash)
             {
@@ -179,7 +210,7 @@ namespace ExtGit.Core.Version1
                         var TN = Path.GetFileNameWithoutExtension(IndexFile.Name);
                         var chunk = Path.Combine(Parent.RepoPath, ".extgit", ".extgitconf", "Traces", Path.GetFileNameWithoutExtension(IndexFile.FullName), FN);
                         File.Create(chunk).Close();
-                        Debugger.CurrentDebugger.Log("Chunk created:" + chunk, LogLevel.Development);
+                        Debugger.CurrentDebugger.Log("Chunk created:" + chunk, Utilities.LogLevel.Development);
                         var FW = File.OpenWrite(chunk);
                         while ((AP = FR.Read(ByteBlock, 0, ByteBlock.Length)) != 0)
                         {
