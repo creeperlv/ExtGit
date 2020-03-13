@@ -2,7 +2,8 @@
   "profiles": {
     "ExtGit": {
       "commandName": "Project",
-      "commandLineArgs": "-T"
+      "commandLineArgs": "-c",
+      "workingDirectory": "C:\\Users\\13760\\Documents\\TestFolder\\"
     }
   }
 }

@@ -25,6 +25,7 @@ namespace ExtGit.Core.Version1
             this.IndexFile = IndexFile;
             Parent = RepoBase;
             LoadIndex();
+            Debugger.CurrentDebugger.Log("Trace Index Found:" + IndexFile.Name + $", FileHash:{FileHash}", LogLevel.Development);
         }
         public static TraceIndex Track(FileInfo TargetFile, Repo ParentRepo)
         {
@@ -32,26 +33,46 @@ namespace ExtGit.Core.Version1
 
             {
                 traceIndex.RelativeFilePath = PathHelper.GetRelativePath(ParentRepo.RepoPath, TargetFile.FullName);
-                traceIndex.FileHash = SHA256Hash.ComputeSHA256(TargetFile.FullName);
+                traceIndex.FileHash = "INIT";
+                //traceIndex.FileHash = SHA256Hash.ComputeSHA256(TargetFile.FullName);
             }
-
+            traceIndex.Parent = ParentRepo;
             return traceIndex;
         }
         public void LoadIndex()
         {
-
+            var lns = File.ReadAllLines(IndexFile.FullName);
+            foreach (var item in lns)
+            {
+                if (item.StartsWith("FileHash="))
+                {
+                    string hash = item.Substring("FileHash=".Length);
+                }
+                else if (item.StartsWith("RelateiveFilePath="))
+                {
+                    RelativeFilePath = item.Substring("RelateiveFilePath=".Length);
+                }
+                else if (item.StartsWith("Chunck."))
+                {
+                    var temp01 = item.Substring("Chunck.".Length);
+                    var Num = temp01.Substring(0, temp01.IndexOf('='));
+                    var FileName = item.Substring(item.IndexOf("=") + 1);
+                    Chunks.Add(int.Parse(Num), FileName);
+                }
+            }
         }
         public static TraceIndex TrackAndRecord(FileInfo TargetFile, Repo ParentRepo)
         {
             var T = Track(TargetFile, ParentRepo);
             var RandomName = Guid.NewGuid() + ".extgit-trace";
-            var FileName = Path.Combine(ParentRepo.RepoPath, ".extgit", ".extgiconf", "Traces", RandomName);
+            var FileName = Path.Combine(ParentRepo.RepoPath, ".extgit", ".extgitconf", "Traces", RandomName);
             while (File.Exists(FileName) == true)
             {
                 //If it happens that the generated guid is used, generate a new one.
                 RandomName = Guid.NewGuid() + ".extgit-trace";
-                FileName = Path.Combine(ParentRepo.RepoPath, ".extgit", ".extgiconf", "Traces", RandomName);
+                FileName = Path.Combine(ParentRepo.RepoPath, ".extgit", ".extgitconf", "Traces", RandomName);
             }
+            File.Create(FileName).Close();
 
             {
                 //Save index.
@@ -65,6 +86,9 @@ namespace ExtGit.Core.Version1
                 }
                 File.WriteAllText(FileName, NewContent);
             }
+
+            Debugger.CurrentDebugger.Log("Start to trace:" + T.RelativeFilePath, LogLevel.Development);
+            T.IndexFile = new FileInfo(FileName);
             return T;
         }
         public void CombineAndOverwrite()
@@ -111,31 +135,38 @@ namespace ExtGit.Core.Version1
                 long ChunkMaxLength = Parent.MaxFileSize;
                 var FR = f.OpenRead();
                 byte[] ByteBlock = new byte[1024];//1KB.
+                {
 
-                for (int i = 0; i < f.Length; i++)
+                    var chunk = Path.Combine(Parent.RepoPath, ".extgit", ".extgitconf", "Traces", Path.GetFileNameWithoutExtension(IndexFile.FullName));
+                    Directory.CreateDirectory(chunk);
+                }
+                for (long i = 0; i < f.Length;)
                 {
                     long Position = 0;
                     if (Chunks.ContainsKey(ChunkID))
                     {
                         int AP = 0;
                         //Locate Chunk File;
-                        var FN = Chunks[i];
+                        var FN = Chunks[ChunkID];
                         var TN = Path.GetFileNameWithoutExtension(IndexFile.Name);
                         var chunk = Path.Combine(Parent.RepoPath, ".extgit", ".extgitconf", "Traces", Path.GetFileNameWithoutExtension(IndexFile.FullName), FN);
+                        Debugger.CurrentDebugger.Log("Chunk find:" + chunk);
                         var FW = File.OpenWrite(chunk);
                         while ((AP = FR.Read(ByteBlock, 0, ByteBlock.Length)) != 0)
                         {
                             {
-                                FW.Write(ByteBlock,0,ByteBlock.Length);
+                                FW.Write(ByteBlock, 0, ByteBlock.Length);
                                 FW.Flush();
                                 //Write To File
                             }
                             Position += AP;
                             if (Position >= Parent.MaxFileSize)
                             {
+                                //i += Position;
                                 break;
                             }
                         }
+                        ChunkID++;
                         FW.Close();
                     }
                     else
@@ -144,9 +175,11 @@ namespace ExtGit.Core.Version1
 
                         int AP = 0;
                         //Locate Chunk File;
-                        var FN = Guid.NewGuid()+".Data-Chunk";
+                        var FN = Guid.NewGuid() + ".Data-Chunk";
                         var TN = Path.GetFileNameWithoutExtension(IndexFile.Name);
                         var chunk = Path.Combine(Parent.RepoPath, ".extgit", ".extgitconf", "Traces", Path.GetFileNameWithoutExtension(IndexFile.FullName), FN);
+                        File.Create(chunk).Close();
+                        Debugger.CurrentDebugger.Log("Chunk created:" + chunk, LogLevel.Development);
                         var FW = File.OpenWrite(chunk);
                         while ((AP = FR.Read(ByteBlock, 0, ByteBlock.Length)) != 0)
                         {
@@ -163,9 +196,11 @@ namespace ExtGit.Core.Version1
                         }
                         FW.Close();
                         //When Chunk is written, the chunk will be add into index file.
-                        Chunks.Add(i, FN);
+                        Chunks.Add(ChunkID, FN);
+                        ChunkID++;
                     }
-                    
+
+                    i += Position;
                 }
                 FR.Close();
                 //Finalize, only when the file is different, index file will be updated.
@@ -174,10 +209,10 @@ namespace ExtGit.Core.Version1
                     var NewContent = "#Generated by ExtGit.Core\r\n";
                     NewContent += $"TraceVersion={TraceVersion}\r\n";
                     NewContent += $"RelateiveFilePath={RelativeFilePath}\r\n";
-                    NewContent += $"FileHash={FileHash}\r\n";
+                    NewContent += $"FileHash={CurrentHash}\r\n";
                     foreach (var item in Chunks)
                     {
-                        NewContent += $"Chunck.{item.Key}={item.Value}";
+                        NewContent += $"Chunck.{item.Key}={item.Value}\r\n";
                     }
                     File.WriteAllText(IndexFile.FullName, NewContent);
                 }

@@ -79,20 +79,20 @@ namespace ExtGit
             {
                 case Operation.Commit:
                     {
-                        try
-                        {
+                        //try
+                        //{
 
                             double prog = 0.0;
                             Repo r = new Repo(new DirectoryInfo("./").FullName);
                             r.Commit(ref prog);
-                        }
-                        catch (Exception e)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.Write(Language.CurrentLanguage.Get("FATAL", "Fatal:"));
-                            Console.ForegroundColor = ConsoleColor.White;
-                            Console.WriteLine(e.Message);
-                        }
+                        //}
+                        //catch (Exception e)
+                        //{
+                        //    Console.ForegroundColor = ConsoleColor.Red;
+                        //    Console.Write(Language.CurrentLanguage.Get("FATAL", "Fatal:"));
+                        //    Console.ForegroundColor = ConsoleColor.White;
+                        //    Console.WriteLine(e.Message);
+                        //}
                     }
                     break;
                 case Operation.Checkout:
