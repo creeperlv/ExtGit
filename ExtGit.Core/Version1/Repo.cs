@@ -165,6 +165,7 @@ namespace ExtGit.Core.Version1
                 DealWithTracedFileDeletion();
                 DealTracesUpdate();
                 //Finalize
+                WipeUselessTraces();
             }
         }
         public void WipeUselessTraces()
@@ -178,10 +179,10 @@ namespace ExtGit.Core.Version1
         {
             foreach (var item in TracedFiles)
             {
-                var AssumedPath = Path.Combine(RepoPath,
-                item.RelativeFilePath);
+                var AssumedPath = Path.Combine(RepoPath,item.RelativeFilePath);
                 if (!File.Exists(AssumedPath))
                 {
+                    Debugger.CurrentDebugger.Log($"Trace index \"{item.RelativeFilePath}\" is scheduled.");
                     item.Schedule();
                 }
             }
@@ -299,8 +300,8 @@ namespace ExtGit.Core.Version1
             if (isTemplate == true)
             {
                 throw new Exception(Language.CurrentLanguage.Get("ERROR_CODE01", "Current repository is a TEMPLATE repository!"));
+            OverwriteDiretory(new DirectoryInfo(RepoPath));
             }
-            CheckDirectory(new DirectoryInfo(RepoPath));
             foreach (var item in TracedFiles)
             {
                 item.CombineAndOverwrite();
