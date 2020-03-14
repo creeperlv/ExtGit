@@ -10,7 +10,7 @@ using Version = System.Version;
 
 namespace ExtGit.Core.Version1
 {
-    public class Repo
+    public partial class Repo
     {
         public string RepoPath
         {

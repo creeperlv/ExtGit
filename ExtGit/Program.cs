@@ -23,10 +23,17 @@ namespace ExtGit
              *      Repo/.ExtGit/.git/...
              * 
              **/
+            GraftOptions options = new GraftOptions();
             for (int i = 0; i < args.Length; i++)
             {
                 switch (args[i].ToUpper())
                 {
+                    case "--GRAFT-LOSE-GIT-HISTORY":
+                        options.KeepGitHistory = false;
+                        break;
+                    case "--GRAFT-HOLD-COMMIT":
+                        options.CommitAfterGraft = false;
+                        break;
                     case "-C":
                     case "COMMIT":
                         CurrentOperation = Operation.Commit;
@@ -65,6 +72,11 @@ namespace ExtGit
                     case "--T":
                     case "-T":
                         CurrentOperation = Operation.FunctionTest;
+                        break;
+                    case "GRAFT":
+                    case "-G":
+                    case "--G":
+                        CurrentOperation = Operation.Graft;
                         break;
                     default:
                         Console.WriteLine("Unknown parameter:" + args[i]);
@@ -123,6 +135,11 @@ namespace ExtGit
                         Tester.Test00();
                     }
                     break;
+                case Operation.Graft:
+                    {
+                        Repo.Graft(new DirectoryInfo(".").FullName,options);
+                    }
+                    break;
                 case Operation.Version:
                     ShowVersion();
                     break;
@@ -153,7 +170,7 @@ namespace ExtGit
 
         static void ShowHelp()
         {
-            for (int i = 0; i < 12; i++)
+            for (int i = 0; i < 19; i++)
             {
                 Console.WriteLine(Language.CurrentLanguage.Get($"HELP{i:D2}"));
             }
