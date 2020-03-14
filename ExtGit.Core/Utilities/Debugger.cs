@@ -6,7 +6,7 @@ namespace ExtGit.Core.Utilities
 {
     public class Debugger : IDebugger
     {
-        
+        public static LogLevel MinLogLevel = LogLevel.Normal;
         public static IDebugger CurrentDebugger = new Debugger();
         public void Log(string msg)
         {
@@ -15,6 +15,7 @@ namespace ExtGit.Core.Utilities
 
         public void Log(string msg, LogLevel logLevel)
         {
+            if(logLevel>MinLogLevel)
             switch (logLevel)
             {
                 case LogLevel.Development:

@@ -1,4 +1,5 @@
 ﻿using ExtGit.Core;
+using ExtGit.Core.Utilities;
 using ExtGit.Core.Version1;
 using ExtGit.Localization;
 using System;
@@ -78,6 +79,32 @@ namespace ExtGit
                     case "--G":
                         CurrentOperation = Operation.Graft;
                         break;
+                    case "--LOG-LEVEL":
+                    case "-LOG-LEVEL":
+                    case "-L":
+                    case "--L":
+                        var logLevel = args[i + 1];
+                        i++;
+                        switch (logLevel.ToUpper())
+                        {
+                            case "FULL":
+                                Debugger.MinLogLevel = LogLevel.Development;
+                                break;
+                            case "STANDARD":
+                            case "STD":
+                                Debugger.MinLogLevel = LogLevel.Normal;
+                                break;
+                            case "WARNING":
+                                Debugger.MinLogLevel = LogLevel.Warning;
+                                break;
+                            case "ERROR":
+                                Debugger.MinLogLevel = LogLevel.Error;
+                                break;
+
+                            default:
+                                break;
+                        }
+                        break;
                     default:
                         Console.WriteLine("Unknown parameter:" + args[i]);
                         break;
@@ -91,20 +118,20 @@ namespace ExtGit
             {
                 case Operation.Commit:
                     {
-                        //try
-                        //{
+                        try
+                        {
 
-                        double prog = 0.0;
+                            double prog = 0.0;
                         Repo r = new Repo(new DirectoryInfo("./").FullName);
                         r.Commit(ref prog);
-                        //}
-                        //catch (Exception e)
-                        //{
-                        //    Console.ForegroundColor = ConsoleColor.Red;
-                        //    Console.Write(Language.CurrentLanguage.Get("FATAL", "Fatal:"));
-                        //    Console.ForegroundColor = ConsoleColor.White;
-                        //    Console.WriteLine(e.Message);
-                        //}
+                        }
+                        catch (Exception e)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.Write(Language.CurrentLanguage.Get("FATAL", "Fatal:"));
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Debugger.CurrentDebugger.Log(e.Message, LogLevel.Error);
+                        }
                     }
                     break;
                 case Operation.Checkout:
@@ -120,9 +147,9 @@ namespace ExtGit
                         catch (Exception e)
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
-                            Console.Write("Fatal:");
+                            Console.Write("Fatal Error");
                             Console.ForegroundColor = ConsoleColor.White;
-                            Console.WriteLine(e.Message);
+                            Debugger.CurrentDebugger.Log(e.Message, LogLevel.Error);
                         }
                     }
                     break;
