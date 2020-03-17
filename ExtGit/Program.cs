@@ -17,7 +17,7 @@ namespace ExtGit
              * 
              * Layout:
              *      Repo/
-             *      Repo/<WorkLoad>
+             *      Repo/<WorkSpace>
              *      Repo/.ExtGit/
              *      Repo/.ExtGit/<ExtGitWorkLoad>
              *      Repo/.ExtGit/.extgitconfigs/ - ExtGit Configurations

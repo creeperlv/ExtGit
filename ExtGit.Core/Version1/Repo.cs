@@ -227,6 +227,7 @@ namespace ExtGit.Core.Version1
                     Directory.SetCreationTime(Path.Combine(RepoPath, ".extgit", RP), directory.CreationTime);
                 }
             }
+            var ExistingDirectory = new List<String>();
             foreach (var item in directory.EnumerateDirectories())
             {
                 Debugger.CurrentDebugger.Log($"Folder: {item.FullName}", Utilities.LogLevel.Development);
