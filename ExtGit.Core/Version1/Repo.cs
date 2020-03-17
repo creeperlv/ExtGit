@@ -228,12 +228,21 @@ namespace ExtGit.Core.Version1
                 }
             }
             var DirectoriesInWorkLoad = new List<String>();
+            var FilesInWorkLoad = new List<String>();
             {
                 var Workload = Path.Combine(RepoPath, ".extgit", RP);
                 DirectoryInfo directoryInfo = new DirectoryInfo(Workload);
                 foreach (var item in directoryInfo.EnumerateDirectories())
                 {
                     DirectoriesInWorkLoad.Add(item.Name);
+                }
+            }
+            {
+                var Workload = Path.Combine(RepoPath, ".extgit", RP);
+                DirectoryInfo directoryInfo = new DirectoryInfo(Workload);
+                foreach (var item in directoryInfo.EnumerateFiles())
+                {
+                    FilesInWorkLoad.Add(item.Name);
                 }
             }
             foreach (var item in directory.EnumerateDirectories())
@@ -254,6 +263,8 @@ namespace ExtGit.Core.Version1
             Directory.SetLastWriteTime(Path.Combine(RepoPath, ".extgit", RP), directory.LastWriteTime);
             foreach (var item in directory.EnumerateFiles())
             {
+                if (FilesInWorkLoad.Contains(item.Name))
+                    FilesInWorkLoad.Remove(item.Name);
                 Debugger.CurrentDebugger.Log($"File: {item.FullName}", Utilities.LogLevel.Development);
                 var FRP = PathHelper.GetRelativePath(RepoPath, item.FullName);
                 var FAP = Path.Combine(RepoPath, ".extgit", FRP);
@@ -308,6 +319,12 @@ namespace ExtGit.Core.Version1
                 {
                     //the same file, ignore.
                     continue;
+                }
+            }
+            {
+                foreach (var item in FilesInWorkLoad)
+                {
+                    File.Delete(Path.Combine(RepoPath, ".extgit", RP, item));
                 }
             }
         }
