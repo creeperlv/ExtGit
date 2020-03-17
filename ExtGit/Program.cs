@@ -164,7 +164,7 @@ namespace ExtGit
                     break;
                 case Operation.Graft:
                     {
-                        Repo.Graft(new DirectoryInfo(".").FullName,options);
+                        Repo.Graft(new DirectoryInfo(".").FullName,options,ShellVersion);
                     }
                     break;
                 case Operation.Version:
