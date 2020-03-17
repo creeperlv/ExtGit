@@ -9,6 +9,28 @@ namespace ExtGit.Core.Utilities
     /// </summary>
     public class PathHelper
     {
+        public static void CopyPath(DirectoryInfo Origin, DirectoryInfo Target,params string[] ignorances)
+        {
+            foreach (var item in ignorances)
+            {
+                if (Origin.FullName.ToUpper().StartsWith(item.ToUpper()))
+                {
+                    return;                
+                }
+            }
+            if (!Target.Exists)
+                Target.Create();
+            foreach (var item in Origin.GetDirectories())
+            {
+
+                CopyPath(item, new DirectoryInfo(Path.Combine(Target.FullName, item.Name)));
+            }
+            foreach (var item in Origin.GetFiles())
+            {
+                item.CopyTo(Path.Combine(Target.FullName, item.Name),true);
+            }
+            return;
+        }
         public static string GetRelativePath(string master, string slave)
         {
             if (!master.EndsWith(Path.DirectorySeparatorChar + ""))

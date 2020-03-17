@@ -147,7 +147,7 @@ namespace ExtGit
                         catch (Exception e)
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
-                            Console.Write("Fatal Error");
+                            Console.Write(Language.CurrentLanguage.Get("FATAL", "Fatal:"));
                             Console.ForegroundColor = ConsoleColor.White;
                             Debugger.CurrentDebugger.Log(e.Message, LogLevel.Error);
                         }
