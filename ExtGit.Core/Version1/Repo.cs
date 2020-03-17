@@ -179,7 +179,7 @@ namespace ExtGit.Core.Version1
         {
             foreach (var item in TracedFiles)
             {
-                var AssumedPath = Path.Combine(RepoPath,item.RelativeFilePath);
+                var AssumedPath = Path.Combine(RepoPath, item.RelativeFilePath);
                 if (!File.Exists(AssumedPath))
                 {
                     Debugger.CurrentDebugger.Log($"Trace index \"{item.RelativeFilePath}\" is scheduled.");
@@ -227,11 +227,27 @@ namespace ExtGit.Core.Version1
                     Directory.SetCreationTime(Path.Combine(RepoPath, ".extgit", RP), directory.CreationTime);
                 }
             }
-            var ExistingDirectory = new List<String>();
+            var DirectoriesInWorkLoad = new List<String>();
+            {
+                var Workload = Path.Combine(RepoPath, ".extgit", RP);
+                DirectoryInfo directoryInfo = new DirectoryInfo(Workload);
+                foreach (var item in directoryInfo.EnumerateDirectories())
+                {
+                    DirectoriesInWorkLoad.Add(item.Name);
+                }
+            }
             foreach (var item in directory.EnumerateDirectories())
             {
+                if(DirectoriesInWorkLoad.Contains(item.Name))
+                DirectoriesInWorkLoad.Remove(item.Name);
                 Debugger.CurrentDebugger.Log($"Folder: {item.FullName}", Utilities.LogLevel.Development);
                 CheckDirectory(item);
+            }
+            {
+                foreach (var item in DirectoriesInWorkLoad)
+                {
+                    PathHelper.RemoveFolderR(new DirectoryInfo(Path.Combine(RepoPath, ".extgit", RP,item)));
+                }
             }
             Debugger.CurrentDebugger.Log($"Deal with: {directory.FullName}", Utilities.LogLevel.Development);
             Directory.SetLastAccessTime(Path.Combine(RepoPath, ".extgit", RP), directory.LastAccessTime);
@@ -301,8 +317,8 @@ namespace ExtGit.Core.Version1
             if (isTemplate == true)
             {
                 throw new Exception(Language.CurrentLanguage.Get("ERROR_CODE01", "Current repository is a TEMPLATE repository!"));
-            OverwriteDiretory(new DirectoryInfo(RepoPath));
             }
+            OverwriteDiretory(new DirectoryInfo(RepoPath));
             foreach (var item in TracedFiles)
             {
                 item.CombineAndOverwrite();
@@ -310,7 +326,7 @@ namespace ExtGit.Core.Version1
         }
         public void OverwriteDiretory(DirectoryInfo directory)
         {
-            
+
             Debugger.CurrentDebugger.Log($"Current Folder: {directory.FullName}", Utilities.LogLevel.Development);
             if (directory.FullName.ToUpper() == Path.Combine(RepoPath, ".extgit").ToUpper())
             {
