@@ -35,6 +35,9 @@ namespace ExtGit
                     case "--GRAFT-HOLD-COMMIT":
                         options.CommitAfterGraft = false;
                         break;
+                    case "--KEEP-ORIGINAL-GIT-REPO":
+                        options.KeepOriginalGitRepo = false;
+                        break;
                     case "-C":
                     case "COMMIT":
                         CurrentOperation = Operation.Commit;
