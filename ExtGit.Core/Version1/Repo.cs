@@ -197,7 +197,7 @@ namespace ExtGit.Core.Version1
         public void CheckDirectory(DirectoryInfo directory)
         {
             Debugger.CurrentDebugger.Log($"Current Folder: {directory.FullName}", Utilities.LogLevel.Development);
-            if (directory.FullName.ToUpper() == Path.Combine(RepoPath, ".extgit").ToUpper())
+            if (directory.FullName.ToUpper() == Path.Combine(RepoPath, ".extgit").ToUpper()|| directory.FullName.ToUpper() == Path.Combine(RepoPath, ".git").ToUpper())
             {
                 Debugger.CurrentDebugger.Log($"Folder: {directory.FullName} is ignored", Utilities.LogLevel.Development);
                 //Don't self copy :P.
@@ -345,7 +345,7 @@ namespace ExtGit.Core.Version1
         {
 
             Debugger.CurrentDebugger.Log($"Current Folder: {directory.FullName}", Utilities.LogLevel.Development);
-            if (directory.FullName.ToUpper() == Path.Combine(RepoPath, ".extgit").ToUpper())
+            if (directory.FullName.ToUpper() == Path.Combine(RepoPath, ".extgit").ToUpper()|| directory.FullName.ToUpper() == Path.Combine(RepoPath, ".git").ToUpper())
             {
                 Debugger.CurrentDebugger.Log($"Folder: {directory.FullName} is ignored", Utilities.LogLevel.Development);
                 //Don't self copy :P.
