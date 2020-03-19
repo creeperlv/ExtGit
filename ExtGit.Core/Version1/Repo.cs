@@ -269,56 +269,89 @@ namespace ExtGit.Core.Version1
                 var FRP = PathHelper.GetRelativePath(RepoPath, item.FullName);
                 var FAP = Path.Combine(RepoPath, ".extgit", FRP);
                 Debugger.CurrentDebugger.Log($"File: RelatedPath:{FRP}", Utilities.LogLevel.Development);
-                if (!File.Exists(FAP))
+               
                 {
-                    //Check trace;
                     bool isTracked = false;
-                    foreach (var titem in TracedFiles)
                     {
-                        if (titem.RelativeFilePath == FRP)
+                        //Even it is existed.
+                        foreach (var titem in TracedFiles)
                         {
-                            Debugger.CurrentDebugger.Log($"Traced File:{titem.RelativeFilePath}, Now relative file:{FRP}", Utilities.LogLevel.Development);
-                            isTracked = true;
-                            break;
-                        }
-                    }
-                    if (isTracked == false)
-                    {
-                        //File is not tracked.
-                        // Detect weather to trace;
-                        if (AutoTrack)
-                        {
-                            if (item.Length > realDetectionLine)
+                            if (titem.RelativeFilePath == FRP)
                             {
-                                //Add to trace.
-                                TracedFiles.Add(TraceIndex.TrackAndRecord(item, this));
-                                isTracked = true;
-                                //TraceIndex.Track(item, this);
-                                continue;
-                            }
-                        }
-                        foreach (var type in AutoTraceFileTypes)
-                        {
-                            if (item.FullName.ToUpper().EndsWith(type.ToUpper()))
-                            {
-                                TracedFiles.Add(TraceIndex.TrackAndRecord(item, this));
+                                Debugger.CurrentDebugger.Log($"Traced File:{titem.RelativeFilePath}, Now relative file:{FRP}", Utilities.LogLevel.Development);
                                 isTracked = true;
                                 break;
                             }
                         }
                         if (isTracked == false)
                         {
-                            item.CopyTo(FAP);
+                            //File is not tracked.
+                            // Detect weather to trace;
+                            if (AutoTrack)
+                            {
+                                if (item.Length > realDetectionLine)
+                                {
+                                    //Add to trace.
+                                    TracedFiles.Add(TraceIndex.TrackAndRecord(item, this));
+                                    isTracked = true;
+                                    //TraceIndex.Track(item, this);
+                                    continue;
+                                }
+                            }
+                            foreach (var type in AutoTraceFileTypes)
+                            {
+                                if (item.FullName.ToUpper().EndsWith(type.ToUpper()))
+                                {
+                                    TracedFiles.Add(TraceIndex.TrackAndRecord(item, this));
+                                    isTracked = true;
+                                    break;
+                                }
+                            }
+                            foreach (var path in AutoTraceFilePaths)
+                            {
+                                if (FRP.StartsWith(path))
+                                {
+                                    TracedFiles.Add(TraceIndex.TrackAndRecord(item, this));
+                                    isTracked = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                    }
+                    if (File.Exists(FAP))
+                    {
+                        if (isTracked == false)
+                        {
+                            {
+                                var NFHASH = SHA256Hash.ComputeSHA256(item.FullName);
+                                var OFHASH = SHA256Hash.ComputeSHA256(FAP);
+                                if (NFHASH == OFHASH)
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    item.CopyTo(FAP);
+                                }
+
+                            }
+                        }
+                        else
+                        {
+                            File.Delete(FAP);
                         }
                     }
-                    continue;
-                }
-                var NFHASH = SHA256Hash.ComputeSHA256(item.FullName);
-                var OFHASH = SHA256Hash.ComputeSHA256(FAP);
-                if (NFHASH == OFHASH)
-                {
-                    //the same file, ignore.
-                    continue;
+                    else
+                    {
+                        if (isTracked == false)
+                        {
+                            item.CopyTo(FAP);
+                        }
+                        else
+                        {
+                        }
+                    }
                 }
             }
             {
