@@ -1,5 +1,7 @@
 ﻿using ExtGit.Core.FileHash;
 using ExtGit.Core.Utilities;
+using ICSharpCode.SharpZipLib.Core;
+using ICSharpCode.SharpZipLib.GZip;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +15,7 @@ namespace ExtGit.Core.Version1
         public Dictionary<int, string> Chunks = new Dictionary<int, string>();
         public string FileHash;
         public FileInfo IndexFile;
+        public bool Compressed = false;
         //private string RepoBase;
         private bool isDeletionScheduled = false;
         private Repo Parent;
@@ -65,6 +68,10 @@ namespace ExtGit.Core.Version1
                 {
                     RelativeFilePath = item.Substring("RelateiveFilePath=".Length);
                 }
+                else if (item.StartsWith("Compressed="))
+                {
+                    Compressed = bool.Parse(item.Substring("Compressed=".Length));
+                }
                 else if (item.StartsWith("Chunck."))
                 {
                     var temp01 = item.Substring("Chunck.".Length);
@@ -104,6 +111,73 @@ namespace ExtGit.Core.Version1
             T.IndexFile = new FileInfo(FileName);
             return T;
         }
+
+        public string PreProcess_Overwrite()
+        {
+
+            if (Compressed == true || Features.CompressLargeFiles == true)
+            {
+                {
+                    var chunk = Path.Combine(Parent.RepoPath, ".extgit", ".extgitconf", "Traces", Path.GetFileNameWithoutExtension(IndexFile.FullName));
+                    var Entry = Path.Combine(chunk, "CompressedFile");
+                    //Compress, then delete.
+                    return Entry;
+                }
+            }
+            else
+                return Path.Combine(Parent.RepoPath, RelativeFilePath);
+        }
+        public void PostProcess_Overwrite()
+        {
+
+            if (Compressed == true || Features.CompressLargeFiles == true)
+            {
+                {
+                    var chunk = Path.Combine(Parent.RepoPath, ".extgit", ".extgitconf", "Traces", Path.GetFileNameWithoutExtension(IndexFile.FullName));
+                    var Entry = Path.Combine(chunk, "CompressedFile");
+                    //Compress, then delete.
+                }
+            }
+        }
+
+        public string PreProcess_Differ()
+        {
+            if (Compressed == true || Features.CompressLargeFiles == true)
+            {
+                {
+                    var oriFile = Path.Combine(Parent.RepoPath, RelativeFilePath);
+                    var chunk = Path.Combine(Parent.RepoPath, ".extgit", ".extgitconf", "Traces", Path.GetFileNameWithoutExtension(IndexFile.FullName));
+                    var Entry = Path.Combine(chunk, "CompressedFile");
+                    Stream outStream = File.Create(Entry);
+                    Stream gzoStream = new GZipOutputStream(outStream);
+                    byte[] DataBuffer = new byte[4096];
+                    using (var FS = File.Open(oriFile, FileMode.Open))
+                    {
+
+                        StreamUtils.Copy(FS, gzoStream, DataBuffer);
+                    }
+                    gzoStream.Close();
+                    Compressed = true;
+                    //Compress, then delete.
+                    return Entry;
+                }
+            }
+            else
+                return Path.Combine(Parent.RepoPath, RelativeFilePath);
+
+
+        }
+        public void PostProcess_Differ()
+        {
+            if (Compressed == true || Features.CompressLargeFiles == true)
+            {
+                var chunk = Path.Combine(Parent.RepoPath, ".extgit", ".extgitconf", "Traces", Path.GetFileNameWithoutExtension(IndexFile.FullName));
+                var Entry = Path.Combine(chunk, "CompressedFile");
+                File.Delete(Entry);
+            }
+
+        }
+
         //Work with check out.
         public void CombineAndOverwrite()
         {
@@ -165,7 +239,8 @@ namespace ExtGit.Core.Version1
             }
             else
             {
-                FileInfo f = new FileInfo(Path.Combine(Parent.RepoPath, RelativeFilePath));
+
+                FileInfo f = new FileInfo(PreProcess_Differ());
                 int ChunkID = 0;
                 long ChunkMaxLength = Parent.MaxFileSize;
                 var FR = f.OpenRead();
@@ -245,12 +320,14 @@ namespace ExtGit.Core.Version1
                     NewContent += $"TraceVersion={TraceVersion}\r\n";
                     NewContent += $"RelateiveFilePath={RelativeFilePath}\r\n";
                     NewContent += $"FileHash={CurrentHash}\r\n";
+                    NewContent += $"Compressed={Compressed}\r\n";
                     foreach (var item in Chunks)
                     {
                         NewContent += $"Chunck.{item.Key}={item.Value}\r\n";
                     }
                     File.WriteAllText(IndexFile.FullName, NewContent);
                 }
+                PostProcess_Differ();
             }
         }
     }
