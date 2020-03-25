@@ -86,26 +86,48 @@ namespace ExtGit
                     case "-LOG-LEVEL":
                     case "-L":
                     case "--L":
-                        var logLevel = args[i + 1];
-                        i++;
-                        switch (logLevel.ToUpper())
                         {
-                            case "FULL":
-                                Debugger.MinLogLevel = LogLevel.Development;
-                                break;
-                            case "STANDARD":
-                            case "STD":
-                                Debugger.MinLogLevel = LogLevel.Normal;
-                                break;
-                            case "WARNING":
-                                Debugger.MinLogLevel = LogLevel.Warning;
-                                break;
-                            case "ERROR":
-                                Debugger.MinLogLevel = LogLevel.Error;
-                                break;
 
-                            default:
-                                break;
+                            var logLevel = args[i + 1];
+                            i++;
+                            switch (logLevel.ToUpper())
+                            {
+                                case "FULL":
+                                    Debugger.MinLogLevel = LogLevel.Development;
+                                    break;
+                                case "STANDARD":
+                                case "STD":
+                                    Debugger.MinLogLevel = LogLevel.Normal;
+                                    break;
+                                case "WARNING":
+                                    Debugger.MinLogLevel = LogLevel.Warning;
+                                    break;
+                                case "ERROR":
+                                    Debugger.MinLogLevel = LogLevel.Error;
+                                    break;
+
+                                default:
+                                    break;
+                            }
+                        }
+                        break;
+                    case "--FEATURE":
+                    case "-FEATURE":
+                    case "FEATURE":
+                    case "--F":
+                    case "-F":
+                        {
+
+                            var FEATURE = args[i + 1];
+                            i++;
+                            switch (FEATURE.ToUpper())
+                            {
+                                case "COMPRESS":
+                                    Features.CompressLargeFiles = true;
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
                         break;
                     default:
@@ -125,8 +147,8 @@ namespace ExtGit
                         {
 
                             double prog = 0.0;
-                        Repo r = new Repo(new DirectoryInfo("./").FullName);
-                        r.Commit(ref prog);
+                            Repo r = new Repo(new DirectoryInfo("./").FullName);
+                            r.Commit(ref prog);
                         }
                         catch (Exception e)
                         {
@@ -167,7 +189,7 @@ namespace ExtGit
                     break;
                 case Operation.Graft:
                     {
-                        Repo.Graft(new DirectoryInfo(".").FullName,options,ShellVersion);
+                        Repo.Graft(new DirectoryInfo(".").FullName, options, ShellVersion);
                     }
                     break;
                 case Operation.Version:

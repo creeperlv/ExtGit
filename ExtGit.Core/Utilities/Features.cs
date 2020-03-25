@@ -7,5 +7,6 @@ namespace ExtGit.Core.Utilities
     public class Features
     {
         public static readonly bool DevelopmentLog = true;
+        public static bool CompressLargeFiles = false;
     }
 }
