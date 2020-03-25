@@ -135,7 +135,21 @@ namespace ExtGit.Core.Version1
                 {
                     var chunk = Path.Combine(Parent.RepoPath, ".extgit", ".extgitconf", "Traces", Path.GetFileNameWithoutExtension(IndexFile.FullName));
                     var Entry = Path.Combine(chunk, "CompressedFile");
-                    //Compress, then delete.
+                    var Target = Path.Combine(Parent.RepoPath, RelativeFilePath);
+                    byte[] dataBuffer = new byte[4096];
+
+                    using (var fs = new FileStream(Entry, FileMode.Open, FileAccess.Read))
+                    {
+                        using (GZipInputStream gzipStream = new GZipInputStream(fs))
+                        {
+
+                            using (FileStream fsOut = File.Create(Target))
+                            {
+                                StreamUtils.Copy(gzipStream, fsOut, dataBuffer);
+                            }
+                        }
+                    }
+                    File.Delete(Target);
                 }
             }
         }
@@ -189,7 +203,7 @@ namespace ExtGit.Core.Version1
             }
             else
             {
-                var p = Path.Combine(Parent.RepoPath, RelativeFilePath);
+                var p = PreProcess_Overwrite();
                 if (!File.Exists(p))
                 {
                     File.Create(p).Close();
@@ -210,6 +224,7 @@ namespace ExtGit.Core.Version1
                     FR.Close();
                 }
                 FW.Close();
+                PostProcess_Overwrite();
             }
         }
         //Work with Commit

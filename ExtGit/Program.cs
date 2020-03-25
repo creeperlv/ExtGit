@@ -222,7 +222,7 @@ namespace ExtGit
 
         static void ShowHelp()
         {
-            for (int i = 0; i < 19; i++)
+            for (int i = 0; i < 25; i++)
             {
                 Console.WriteLine(Language.CurrentLanguage.Get($"HELP{i:D2}"));
             }
