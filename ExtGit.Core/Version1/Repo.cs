@@ -232,8 +232,11 @@ namespace ExtGit.Core.Version1
             {
                 var Workload = Path.Combine(RepoPath, ".extgit", RP);
                 DirectoryInfo directoryInfo = new DirectoryInfo(Workload);
+                Debugger.CurrentDebugger.Log("Check:" + directoryInfo.FullName, Utilities.LogLevel.Development);
                 foreach (var item in directoryInfo.EnumerateDirectories())
                 {
+                    if (item.Name.ToUpper() == ".GIT" || item.Name.ToUpper() == ".EXTGITCONF" || item.Name.ToUpper() == ".EXTGIT")
+                        continue;
                     DirectoriesInWorkLoad.Add(item.Name);
                 }
             }
@@ -247,7 +250,7 @@ namespace ExtGit.Core.Version1
             }
             foreach (var item in directory.EnumerateDirectories())
             {
-                if(DirectoriesInWorkLoad.Contains(item.Name))
+                if (DirectoriesInWorkLoad.Contains(item.Name))
                 DirectoriesInWorkLoad.Remove(item.Name);
                 Debugger.CurrentDebugger.Log($"Folder: {item.FullName}", Utilities.LogLevel.Development);
                 CheckDirectory(item);
