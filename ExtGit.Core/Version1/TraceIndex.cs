@@ -276,7 +276,9 @@ namespace ExtGit.Core.Version1
                         var TN = Path.GetFileNameWithoutExtension(IndexFile.Name);
                         var chunk = Path.Combine(Parent.RepoPath, ".extgit", ".extgitconf", "Traces", Path.GetFileNameWithoutExtension(IndexFile.FullName), FN);
                         Debugger.CurrentDebugger.Log("Chunk find:" + chunk);
-                        var FW = File.OpenWrite(chunk);
+                        File.Delete(chunk);//Clear chunk before overwrite it.
+                        var FW = File.Create(chunk);
+                        
                         while ((AP = FR.Read(ByteBlock, 0, ByteBlock.Length)) != 0)
                         {
                             {
@@ -303,9 +305,9 @@ namespace ExtGit.Core.Version1
                         var FN = Guid.NewGuid() + ".Data-Chunk";
                         var TN = Path.GetFileNameWithoutExtension(IndexFile.Name);
                         var chunk = Path.Combine(Parent.RepoPath, ".extgit", ".extgitconf", "Traces", Path.GetFileNameWithoutExtension(IndexFile.FullName), FN);
-                        File.Create(chunk).Close();
+                        
                         Debugger.CurrentDebugger.Log("Chunk created:" + chunk, Utilities.LogLevel.Development);
-                        var FW = File.OpenWrite(chunk);
+                        var FW = File.Create(chunk);
                         while ((AP = FR.Read(ByteBlock, 0, ByteBlock.Length)) != 0)
                         {
                             {
@@ -327,6 +329,22 @@ namespace ExtGit.Core.Version1
 
                     i += Position;
                 }
+                {
+                    //Process when ths file is smaller than before.
+                    //ChunkID is 1 larger than real last ID, so it can mean the count in the same time.
+                    if (Chunks.Count > ChunkID)
+                    {
+                        for (int i = ChunkID; i < Chunks.Count; i++)
+                        {
+                            var FN = Chunks[i];
+                            var chunk = Path.Combine(Parent.RepoPath, ".extgit", ".extgitconf", "Traces", Path.GetFileNameWithoutExtension(IndexFile.FullName), FN);
+                            File.Delete(chunk);
+                            Chunks.Remove(i);
+                        }
+                    }
+                }
+
+
                 FR.Close();
                 //Finalize, only when the file is different, index file will be updated.
                 {
