@@ -8,10 +8,10 @@
   <StackPanel>
     <TextBlock FontSize="36">ExtGit</TextBlock>
     <StackPanel Margin="25">
-      <Button>COMMIT</Button>
-      <Button>CHECKOUT</Button>
-      <Button>GRAFT</Button>
-      <Button>GRAFT</Button>
+      <Button BorderThickness="0">COMMIT</Button>
+      <Button BorderThickness="0">CHECKOUT</Button>
+      <Button BorderThickness="0">GRAFT</Button>
+      <Button BorderThickness="0">GRAFT</Button>
     </StackPanel>
   </StackPanel>
 

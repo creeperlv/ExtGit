@@ -22,6 +22,10 @@ namespace ExtGit.Core.Version1
         public Version ExtGitVer;
         public Version ExtGitVerCore;
         public long MaxFileSize = 1024 * 1024 * 99;//100MB is the max file size limit of GitHub. Must be align to 1 KB
+        public bool AutoCommitToGit = false;
+        public bool AutoPushAfterCommit = false;
+        public string Author_Name;
+        public string Author_Email;
         public bool AutoTrack = true;//Auto track files that overflow the limit.
         public double TraceTriggerLevel = 0.9;//MaxFile*TraceTriggerLevel is the actual detection-line.
         public bool IgnoreIgnoredFile = true;//Load .gitignore
@@ -151,7 +155,7 @@ namespace ExtGit.Core.Version1
             }
             realDetectionLine = (long)(((double)MaxFileSize) * TraceTriggerLevel);
         }
-        public void Commit(ref double progress)
+        public void Commit(ref double progress,string commitMsg="")
         {
             if (isTemplate == true)
             {
@@ -162,11 +166,24 @@ namespace ExtGit.Core.Version1
             {
                 //Will read all filses.
                 CheckDirectory(new DirectoryInfo(RepoPath));
+                progress = 0.3;
                 DealWithTracedFileDeletion();
+                progress = 0.6;
                 DealTracesUpdate();
+                progress = 0.9;
                 //Finalize
                 WipeUselessTraces();
+                if (AutoCommitToGit)
+                {
+                    Signature signature = GitRepo.Config.BuildSignature(DateTimeOffset.Now);
+                    GitRepo.Commit(commitMsg, signature, signature);
+                    if (AutoPushAfterCommit)
+                    {
+                        GitRepo.Network.Push(GitRepo.Head.TrackedBranch);
+                    }
+                }
             }
+            progress = 1;
         }
         public void WipeUselessTraces()
         {
