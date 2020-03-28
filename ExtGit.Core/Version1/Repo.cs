@@ -90,6 +90,8 @@ namespace ExtGit.Core.Version1
                 ConFileContent += $"AutoTrack={r.AutoTrack}\r\n";
                 ConFileContent += $"TraceTriggerLevel={r.TraceTriggerLevel}\r\n";
                 ConFileContent += $"IgnoreIgnoredFile={r.IgnoreIgnoredFile}\r\n";
+                ConFileContent += $"AutoCommitToGit={r.AutoCommitToGit}\r\n";
+                ConFileContent += $"AutoPushAfterCommit={r.AutoPushAfterCommit}\r\n";
                 foreach (var item in r.AutoTraceFileTypes)
                 {
                     ConFileContent += $"AutoTraceFileType={item}\r\n";
@@ -127,6 +129,14 @@ namespace ExtGit.Core.Version1
                     else if (item.StartsWith("AutoTrack="))
                     {
                         AutoTrack = bool.Parse(item.Substring("AutoTrack=".Length));
+                    }
+                    else if (item.StartsWith("AutoCommitToGit="))
+                    {
+                        AutoTrack = bool.Parse(item.Substring("AutoCommitToGit=".Length));
+                    }
+                    else if (item.StartsWith("AutoPushAfterCommit="))
+                    {
+                        AutoTrack = bool.Parse(item.Substring("AutoPushAfterCommit=".Length));
                     }
                     else if (item.StartsWith("TraceTriggerLevel="))
                     {
