@@ -5,9 +5,11 @@ VisualStudioVersion = 16.0.29820.132
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtGit", "ExtGit\ExtGit.csproj", "{5C79AE0E-37AE-4BC7-BB05-7DB790A9273C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtGit.Core", "ExtGit.Core\ExtGit.Core.csproj", "{6EEF7D64-FB2E-467C-8315-CBD24CBF88DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtGit.Core", "ExtGit.Core\ExtGit.Core.csproj", "{6EEF7D64-FB2E-467C-8315-CBD24CBF88DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtGit.Localization", "ExtGit.Localization\ExtGit.Localization.csproj", "{7EAE6633-B8F4-4D98-94F1-8963E0262E25}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtGit.Localization", "ExtGit.Localization\ExtGit.Localization.csproj", "{7EAE6633-B8F4-4D98-94F1-8963E0262E25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtGit.GUI", "ExtGit.GUI\ExtGit.GUI.csproj", "{6F336E40-9A53-463B-856B-EA199FD04127}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{7EAE6633-B8F4-4D98-94F1-8963E0262E25}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7EAE6633-B8F4-4D98-94F1-8963E0262E25}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7EAE6633-B8F4-4D98-94F1-8963E0262E25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F336E40-9A53-463B-856B-EA199FD04127}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F336E40-9A53-463B-856B-EA199FD04127}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F336E40-9A53-463B-856B-EA199FD04127}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F336E40-9A53-463B-856B-EA199FD04127}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

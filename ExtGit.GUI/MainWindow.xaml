@@ -1,0 +1,18 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="500" Width="400" Height="500"
+        x:Class="ExtGit.GUI.MainWindow"
+        Title="ExtGit.GUI">
+  <StackPanel>
+    <TextBlock FontSize="36">ExtGit</TextBlock>
+    <StackPanel Margin="25">
+      <Button>COMMIT</Button>
+      <Button>CHECKOUT</Button>
+      <Button>GRAFT</Button>
+      <Button>GRAFT</Button>
+    </StackPanel>
+  </StackPanel>
+
+</Window>
